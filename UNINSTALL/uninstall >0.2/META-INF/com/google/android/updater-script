@@ -1,0 +1,58 @@
+show_progress(1.000000, 0);
+ui_print("");
+ui_print(" #####           ######   #####   #####  ");
+ui_print("#     #   #   #  #     # #     # #     # ");
+ui_print("#          # #   #     # #     # #     # ");
+ui_print(" #####      #    ######   #####   ###### ");
+ui_print("      #     #    #   #   #     #       # ");
+ui_print("#     #     #    #    #  #     # #     # ");
+ui_print(" #####      #    #     #  #####   #####  ");
+ui_print("");
+ui_print("#     #  #######  #     #                ");
+ui_print("#  #  #     #     ##   ##   ####   ##### ");
+ui_print("#  #  #     #     # # # #  #    #  #    #");
+ui_print("#  #  #     #     #  #  #  #    #  #    #");
+ui_print("#  #  #     #     #     #  #    #  #    #");
+ui_print("#  #  #     #     #     #  #    #  #    #");
+ui_print(" ## ##      #     #     #   ####   ##### ");
+ui_print("                                         ");
+ui_print(" version 0.2                             ");
+ui_print("");
+
+ui_print("Mounting partitions");
+ui_print("");
+mount("ext3", "/dev/block/mmcblk0p12", "/system");
+mount("ext3", "/dev/block/mmcblk0p16", "/data");
+mount("ext3", "/dev/block/mmcblk0p13", "/osh");
+set_progress(0.100000);
+
+ui_print("Verifying firmware version");
+ui_print("");
+assert(file_getprop("/system/build.prop", "ro.build.fingerprint") == "MOTO/olyatt/olympus/olympus:2.2.2/OLYFR_U4_1.8.3/1301957996:user/ota-rel-keys,release-keys");
+
+ui_print("Removing/restoring files");
+ui_print("");
+delete("/osh/usr/sbin/debian");
+delete("/osh/usr/sbin/xterm");
+package_extract_file("home/adas/.gconf/apps/avant-window-navigator/window_manager/%gconf.xml", "/data/home/adas/.gconf/apps/avant-window-navigator/window_manager/%gconf.xml");
+package_extract_file("etc/tomoyo/domain_policy.conf", "/osh/etc/tomoyo/domain_policy.conf");
+package_extract_file("etc/tomoyo/sudoers", "/osh/etc/sudoers");
+delete("/osh/usr/share/applications/debian.desktop");
+delete("/osh/usr/share/applications/terminal.desktop");
+set_progress(0.200000);
+
+ui_print("Setting proper permissions.");
+ui_print("");
+set_perm(0, 0, 0755, "/osh/usr/sbin/debian");
+set_perm(0, 0, 0755, "/osh/usr/sbin/terminal");
+set_perm(5000, 5000, 0600, "/data/home/adas/.gconf/apps/avant-window-navigator/window_manager/%gconf.xml");
+set_perm(0, 0, 0644, "/osh/etc/tomoyo/domain_policy.conf");
+set_perm(0, 0, 0440, "/osh/etc/sudoers");
+set_perm(0, 0, 0644, "/osh/usr/share/applications/debian.desktop");
+set_perm(0, 0, 0644, "/osh/usr/share/applications/terminal.desktop");
+unmount("/system");unmount("/data");unmount("/osh");
+
+ui_print("COPY a debian disk in /sdcard/DEBIAN before start WebTop!");
+ui_print("");
+set_progress(1.000000);
+

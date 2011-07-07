@@ -1,0 +1,130 @@
+#!/bin/bash
+
+CHROOTDIR="/osh/opt/WebTopMOD/root"
+LOOPDEVICE="/dev/block/loop50"
+
+function enablex {
+	xhost +
+}
+
+function mountlinuxdisk {
+	loopdevice
+	sudo mount -t ext3 -o loop=$LOOPDEVICE $FILENAME $CHROOTDIR
+	touch /tmp/linuxdiskactive
+}
+
+function umountlinuxdisk {
+	sudo umount $CHROOTDIR
+	sudo umount $LOOPDEVICE
+	rm /tmp/linuxdiskactive
+}
+
+function startfulllinuxchroot {
+	mountlinuxdisk
+	sudo mount -o bind /proc $CHROOTDIR/proc
+	sudo mount -o bind /dev $CHROOTDIR/dev
+	sudo mount -o bind /dev/pts $CHROOTDIR/dev/pts
+	sudo mount -o bind /dev/shm $CHROOTDIR/dev/shm
+	#sudo mount -o bind /proc/bus/usb $CHROOTDIR/proc/bus/usb
+	sudo mount -o bind /sys $CHROOTDIR/sys
+	sudo mount -o bind /tmp $CHROOTDIR/tmp
+	sudo mount -o bind /var/tmp $CHROOTDIR/var/tmp
+	sudo mount -o bind /var/run/dbus/ $CHROOTDIR/var/run/dbus
+	sudo mount -t vfat /dev/block/vold/179:18 $CHROOTDIR/sdcard
+	sudo mount -t vfat /dev/block/vold/179:33 $CHROOTDIR/sdcard-ext
+	sudo mount -o bind /etc $CHROOTDIR/mnt/DEVICE/etc
+	sudo mount -o bind /usr $CHROOTDIR/mnt/DEVICE/usr
+	touch /tmp/fulllinuxchrootactive
+}
+
+function startxterm {
+	sudo chroot $CHROOTDIR /usr/bin/xterm pdmenu
+}
+
+function stopfullchroot {
+	CHECKS=0
+	until [ "$CHECKS" -eq "15" ]
+	do
+		TOUMOUNT=`sudo mount | grep "$CHROOTDIR" | awk '{ print $3 }'`
+	
+		if [ "$TOUMOUNT" = "" ]; then break; fi
+	
+		for i in $TOUMOUNT
+		do
+			sudo umount $i
+		done
+		CHECKS=$(( $CHECKS + 1 ))
+	done
+	
+		rm /tmp/fulllinuxchrootactive
+	
+	mountlinuxdisk
+}
+
+function checkwhereislinux {
+	if [ -e /sdcard/WebTopMOD/linuxdisk ]; then
+		FILENAME="/sdcard/WebTopMOD/linuxdisk"
+		if [ "$1" -eq 1 ]; then
+			/usr/bin/xmessage "Found image in /sdcard/WebTopMOD/linuxdisk!"
+			checklinuxdisk
+		fi
+	else
+		if [ -e /sdcard-ext/WebTopMOD/linuxdisk ]; then
+			FILENAME="/sdcard-ext/WebTopMOD/linuxdisk"
+			if [ "$1" -eq 1 ]; then
+				/usr/bin/xmessage "Found image in /sdcard-ext/WebTopMOD/linuxdisk!"
+				checklinuxdisk
+			fi
+		else
+			if [ "$1" -eq 1 ]; then
+				/usr/bin/xmessage "Sorry, no image available... put linuxdisk in /sdcard/WebTopMOD/ OR /sdcard-ext/WebTopMOD/linuxdisk"
+				exit 1
+			fi
+		fi
+	fi
+}
+
+function checklinuxdisk {
+	if [ ! -s $FILENAME ]; then
+		/usr/bin/xmessage "But... Wait... Your disk looks damaged, maybe you tried to copy an image larger then 4gB? This is a FAT32 limit."
+		exit 1
+	fi
+	if [ -d $FILENAME ]; then
+		/usr/bin/xmessage "Damn! linuxdisk is a file and it MUST be placed in /sdcard/WebTopMOD/ OR /sdcard-ext/WebTopMOD/ folder. Otherwise this mod CAN'T work' "
+		exit 1
+	fi
+}
+
+function loopdevice {
+	if [ -e $LOOPDEVICE ]; then
+		echo "Device exist"
+	else
+		sudo mknod -m600 $LOOPDEVICE b 7 50
+	fi
+}
+
+enablex
+
+if [ -e /tmp/linuxdiskactive ]; then
+	if [ -e /tmp/fulllinuxchrootactive ]; then
+		startxterm
+	else
+		checkwhereislinux 0
+		startfulllinuxchroot
+		startxterm
+	fi
+else
+	checkwhereislinux 1
+	mountlinuxdisk
+	startfulllinuxchroot
+	startxterm
+fi
+
+RUNNINGXTERM=`ps -C xterm h | wc -l`
+if [ "$RUNNINGXTERM" -eq 0 ]
+then
+	stopfullchroot
+	umountlinuxdisk
+fi
+
+exit 0

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+PULL="sudo ~/bin/linux/32bit/android-sdk-linux_x86/platform-tools/adb pull "
+DESTINATION="/home/michele/easy"
+
+for i in /etc/tomoyo/domain_policy.conf /usr/sbin/debian /usr/sbin/xterm /usr/share/applications/debian.desktop /usr/share/applications/terminal.desktop /sdcard/DEBIAN/debian.png
+do
+   $PULL $i $DESTINATION/$i
+done
+echo "remember sudo ~/bin/linux/32bit/android-sdk-linux_x86/platform-tools/adb pull /sdcard/DEBIAN/debian ~/easy/debian"
+echo "remember gconf"

@@ -1,0 +1,67 @@
+show_progress(1.000000, 0);
+ui_print("");
+ui_print(" #####           ######   #####   #####  ");
+ui_print("#     #   #   #  #     # #     # #     # ");
+ui_print("#          # #   #     # #     # #     # ");
+ui_print(" #####      #    ######   #####   ###### ");
+ui_print("      #     #    #   #   #     #       # ");
+ui_print("#     #     #    #    #  #     # #     # ");
+ui_print(" #####      #    #     #  #####   #####  ");
+ui_print("");
+ui_print("#     #  #######  #     #                ");
+ui_print("#  #  #     #     ##   ##   ####   ##### ");
+ui_print("#  #  #     #     # # # #  #    #  #    #");
+ui_print("#  #  #     #     #  #  #  #    #  #    #");
+ui_print("#  #  #     #     #     #  #    #  #    #");
+ui_print("#  #  #     #     #     #  #    #  #    #");
+ui_print(" ## ##      #     #     #   ####   ##### ");
+ui_print("                                         ");
+ui_print(" version 0.2.5.2                         ");
+ui_print("");
+
+ui_print("Mounting partitions");
+ui_print("");
+mount("ext3", "EMMC", "/dev/block/mmcblk0p12", "/system");
+mount("ext3", "EMMC", "/dev/block/mmcblk0p16", "/data");
+mount("ext3", "EMMC", "/dev/block/mmcblk0p13", "/osh");
+set_progress(0.100000);
+
+ui_print("Backuping files");
+ui_print("");
+package_extract_file("webtopmod.sh","/data/local/tmp/webtopmod.sh");
+set_perm(0, 0, 0755, "/data/local/tmp/webtopmod.sh");
+run_program("/data/local/tmp/webtopmod.sh");
+delete("/data/local/tmp/webtopmod.sh");
+set_progress(0.200000);
+
+ui_print("Copying files");
+ui_print("");
+package_extract_file("usr/sbin/linux", "/osh/usr/sbin/linux");
+package_extract_file("usr/bin/lxterminal", "/osh/usr/bin/lxterminal");
+package_extract_file("usr/bin/xmessage", "/osh/usr/bin/xmessage");
+package_extract_file("home/adas/.gconf/apps/avant-window-navigator/window_manager/%gconf.xml", "/data/home/adas/.gconf/apps/avant-window-navigator/window_manager/%gconf.xml");
+package_extract_file("etc/tomoyo/domain_policy.conf", "/osh/etc/tomoyo/domain_policy.conf");
+package_extract_file("etc/sudoers", "/osh/etc/sudoers");
+package_extract_file("usr/share/applications/linux.desktop", "/osh/usr/share/applications/linux.desktop");
+package_extract_file("usr/share/applications/leafpad.desktop", "/osh/usr/share/applications/leafpad.desktop");
+package_extract_file("opt/WebTopMOD/icons/linux.png", "/osh/opt/WebTopMOD/icons/linux.png");
+set_progress(0.300000);
+
+ui_print("Setting proper permissions.");
+ui_print("");
+set_perm(5000, 5000, 0755, "/osh/usr/sbin/linux");
+set_perm(5000, 5000, 0755, "/osh/usr/bin/lxterminal");
+set_perm(5000, 5000, 0755, "/osh/usr/bin/xmessage");
+set_perm_recursive(5000, 5000, 0700, 0700, "/data/home/adas/.gconf/apps/avant-window-navigator/window_manager/");
+set_perm(0, 0, 0644, "/osh/etc/tomoyo/domain_policy.conf");
+set_perm(0, 0, 0440, "/osh/etc/sudoers");
+set_perm(0, 0, 0644, "/osh/usr/share/applications/linux.desktop");
+set_perm(0, 0, 0644, "/osh/usr/share/applications/leafpad.desktop");
+set_perm(5000, 5000, 0777, "/osh/opt/WebTopMOD/");
+unmount("/system");unmount("/data");unmount("/osh");
+set_progress(0.400000);
+
+ui_print("COPY a linux disk in /sdcard(-ext)/WebTopMOD!");
+ui_print("");
+set_progress(1.000000);
+

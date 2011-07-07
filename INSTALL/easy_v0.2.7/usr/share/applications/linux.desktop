@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Linux
+GenericName=Linux
+Comment=Run Linux environment
+TryExec="/usr/sbin/linux"
+Exec="/usr/sbin/linux"
+Icon=/opt/WebTopMOD/icons/linux.png
+Type=Application
+

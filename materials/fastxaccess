@@ -1,0 +1,5 @@
+su
+/usr/bin/sudo -H -u adas bash
+cd /sdcard/DEBIAN
+export DISPLAY=:0
+xhost +

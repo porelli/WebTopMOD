@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Leafpad
+GenericName=Notepad
+Comment=Edit text files
+TryExec=leafpad
+Exec=leafpad
+Icon=leafpad
+Type=Application
+Categories=GTK;Utility;Editor;
